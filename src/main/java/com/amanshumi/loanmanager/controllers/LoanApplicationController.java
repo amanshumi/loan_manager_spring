@@ -53,4 +53,10 @@ public class LoanApplicationController {
         RepaymentResponse response = loanApplicationService.repayLoan(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/{loanId}/repayment-history")
+    public ResponseEntity<RepaymentHistoryResponseDTO> getRepaymentHistory(@PathVariable Long loanId) {
+        RepaymentHistoryResponseDTO repaymentHistory = loanApplicationService.getRepaymentHistory(loanId);
+        return ResponseEntity.ok(repaymentHistory);
+    }
 }

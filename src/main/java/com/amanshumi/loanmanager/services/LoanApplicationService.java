@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LoanApplicationService {
@@ -211,5 +212,29 @@ public class LoanApplicationService {
         repaymentRepository.save(repayment);
 
         return new RepaymentResponse("Repayment recorded for loan application with id: " + request.getLoanId(), remainingAmountWithInterest);
+    }
+
+    public RepaymentHistoryResponseDTO getRepaymentHistory(Long loanId) {
+        LoanApplication loanApplication = loanApplicationRepository.findById(loanId)
+                .orElseThrow(() -> new LoanApplicationNotFoundException("Loan application not found with id: " + loanId));
+
+        List<Repayment> repayments = repaymentRepository.findByLoanApplicationId(loanId);
+
+        List<RepaymentHistoryResponseDTO.RepaymentDTO> repaymentDTOs = repayments.stream()
+                .map(repayment -> {
+                    RepaymentHistoryResponseDTO.RepaymentDTO repaymentDTO = new RepaymentHistoryResponseDTO.RepaymentDTO();
+                    repaymentDTO.setAmount(repayment.getAmount());
+                    repaymentDTO.setPaymentDate(repayment.getPaymentDate());
+                    repaymentDTO.setInterest(repayment.getInterest());
+                    repaymentDTO.setPrincipal(repayment.getPrincipal());
+                    return repaymentDTO;
+                })
+                .collect(Collectors.toList());
+
+        RepaymentHistoryResponseDTO responseDTO = new RepaymentHistoryResponseDTO();
+        responseDTO.setLoanId(loanId);
+        responseDTO.setRepayments(repaymentDTOs);
+
+        return responseDTO;
     }
 }
