@@ -5,7 +5,9 @@ import com.amanshumi.loanmanager.dto.request.LoanApplicationRequestDTO;
 import com.amanshumi.loanmanager.dto.request.RejectLoanRequest;
 import com.amanshumi.loanmanager.dto.request.RepaymentRequest;
 import com.amanshumi.loanmanager.dto.response.*;
+import com.amanshumi.loanmanager.services.DisbursementService;
 import com.amanshumi.loanmanager.services.LoanApplicationService;
+import com.amanshumi.loanmanager.services.RepaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,10 @@ public class LoanApplicationController {
 
     @Autowired
     private LoanApplicationService loanApplicationService;
+    @Autowired
+    private DisbursementService disbursementService;
+    @Autowired
+    private RepaymentService repaymentService;
 
     @PostMapping("/apply")
     public ResponseEntity<LoanApplicationResponseDTO> submitLoanApplication(@RequestBody LoanApplicationRequestDTO request) {
@@ -44,19 +50,19 @@ public class LoanApplicationController {
 
     @PostMapping("/{loanId}/disburse")
     public ResponseEntity<DisburseLoanResponse> disburseLoan(@PathVariable Long loanId) {
-        DisburseLoanResponse response = loanApplicationService.disburseLoan(loanId);
+        DisburseLoanResponse response = disbursementService.disburseLoan(loanId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/{loanId}/repay")
     public ResponseEntity<RepaymentResponse> repayLoan(@RequestBody RepaymentRequest request) {
-        RepaymentResponse response = loanApplicationService.repayLoan(request);
+        RepaymentResponse response = repaymentService.repayLoan(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{loanId}/repayment-history")
     public ResponseEntity<RepaymentHistoryResponseDTO> getRepaymentHistory(@PathVariable Long loanId) {
-        RepaymentHistoryResponseDTO repaymentHistory = loanApplicationService.getRepaymentHistory(loanId);
+        RepaymentHistoryResponseDTO repaymentHistory = repaymentService.getRepaymentHistory(loanId);
         return ResponseEntity.ok(repaymentHistory);
     }
 }
