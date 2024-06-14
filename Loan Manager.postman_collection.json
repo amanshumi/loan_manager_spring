@@ -1,0 +1,190 @@
+{
+	"info": {
+		"_postman_id": "e6d55e88-4d41-42a9-a102-352ce0894b7e",
+		"name": "Loan Manager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19338903"
+	},
+	"item": [
+		{
+			"name": "Apply for new loan",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"borrowerName\": \"Amanuel Shumi\",\r\n    \"borrowerAddress\": \"Kolfe Keranio, Addis Ababa\",\r\n    \"borrowerPhoneNumber\": \"+251979611114\",\r\n    \"borrowerEmail\": \"amanuelshumi14@gmail.com\",\r\n    \"borrowerIncome\": 75000,\r\n    \"borrowerCreditScore\": 720,\r\n    \"loanAmount\": 15000,\r\n    \"term\": 36,\r\n    \"purpose\": \"Sales\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/loans/apply",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"loans",
+						"apply"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Loan Details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/loans/details/102",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"loans",
+						"details",
+						"102"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Repayment History",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/loans/102/repayment-history",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"loans",
+						"102",
+						"repayment-history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Loan",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"loanId\": 102,\r\n    \"approver\": \"Amanuel\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/loans/approve",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"loans",
+						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reject Loan",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"loanId\": 152,\r\n    \"approver\": \"Amanuel\",\r\n    \"reason\": \"Trade Licence is not legit\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/loans/reject",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"loans",
+						"reject"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Disburse Loan",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/loans/152/disburse",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"loans",
+						"152",
+						"disburse"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Repay Loan",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"loanId\": 102,\r\n    \"amount\": 780.00\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/loans/152/repay",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"loans",
+						"152",
+						"repay"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
