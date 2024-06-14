@@ -67,5 +67,18 @@ public class LoanApplicationResponseDTO {
     public void setApplicationDate(LocalDate applicationDate) {
         this.applicationDate = applicationDate;
     }
+
+    @Override
+    public String toString() {
+        return "LoanApplicationResponseDTO{" +
+                "id=" + id +
+                ", borrowerId=" + borrowerId +
+                ", loanAmount=" + loanAmount +
+                ", term=" + term +
+                ", purpose='" + purpose + '\'' +
+                ", status='" + status + '\'' +
+                ", applicationDate=" + applicationDate +
+                '}';
+    }
 }
 

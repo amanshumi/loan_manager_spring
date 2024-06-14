@@ -84,4 +84,19 @@ public class LoanApplicationRequestDTO {
     public void setPurpose(String purpose) {
         this.purpose = purpose;
     }
+
+    @Override
+    public String toString() {
+        return "LoanApplicationRequestDTO{" +
+                "borrowerName='" + borrowerName + '\'' +
+                ", borrowerAddress='" + borrowerAddress + '\'' +
+                ", borrowerPhoneNumber='" + borrowerPhoneNumber + '\'' +
+                ", borrowerEmail='" + borrowerEmail + '\'' +
+                ", borrowerIncome=" + borrowerIncome +
+                ", borrowerCreditScore=" + borrowerCreditScore +
+                ", loanAmount=" + loanAmount +
+                ", term=" + term +
+                ", purpose='" + purpose + '\'' +
+                '}';
+    }
 }

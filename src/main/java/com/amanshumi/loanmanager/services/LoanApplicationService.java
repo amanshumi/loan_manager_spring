@@ -10,6 +10,8 @@ import com.amanshumi.loanmanager.repositories.BorrowerRepository;
 import com.amanshumi.loanmanager.repositories.LoanApplicationRepository;
 import com.amanshumi.loanmanager.repositories.LoanDisbursementRepository;
 import com.amanshumi.loanmanager.repositories.RepaymentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +34,12 @@ public class LoanApplicationService {
     @Autowired
     private BorrowerRepository borrowerRepository;
 
+    private Logger myLoanLogger = LoggerFactory.getLogger(LoanApplicationService.class);
+
     @Transactional
     public LoanApplicationResponseDTO submitLoanApplication(LoanApplicationRequestDTO request) {
+        myLoanLogger.info("Starting Loan Request");
+        myLoanLogger.info("Payload: " + request.toString());
         // Check if borrower exists by email
         Optional<Borrower> optionalBorrower = borrowerRepository.findByEmail(request.getBorrowerEmail());
         Borrower borrower;
@@ -43,6 +49,7 @@ public class LoanApplicationService {
             boolean hasOutstandingLoan = loanApplicationRepository.existsByBorrowerAndApprovalStatus_Status(borrower, "PENDING") ||
                     loanApplicationRepository.existsByBorrowerAndApprovalStatus_Status(borrower, "APPROVED");
             if (hasOutstandingLoan) {
+                myLoanLogger.error("Borrower has an outstanding loan");
                 throw new OutstandingLoanException("Borrower has an outstanding loan. Please return the previous loan first.");
             }
         } else {
@@ -82,6 +89,9 @@ public class LoanApplicationService {
         response.setPurpose(loanApplication.getPurpose());
         response.setStatus(approvalStatus.getStatus());
         response.setApplicationDate(loanApplication.getApplicationDate());
+
+        myLoanLogger.info("Loan Created Successfully");
+        myLoanLogger.info("DETAILS: " + response.toString());
 
         return response;
     }
