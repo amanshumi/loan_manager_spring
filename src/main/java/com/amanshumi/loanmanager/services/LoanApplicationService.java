@@ -187,6 +187,7 @@ public class LoanApplicationService {
         BigDecimal loanAmount = loanApplication.getLoanAmount();
         BigDecimal interestRate = new BigDecimal("0.1"); // Interest rate (10%)
         BigDecimal totalAmountToBePaid = loanAmount.add(loanAmount.multiply(interestRate));
+        BigDecimal totalInterest = loanAmount.multiply(interestRate);
 
         BigDecimal totalRepaymentsMade = repaymentRepository.getTotalRepaymentsByLoanApplication(loanApplication);
         BigDecimal remainingBalance = totalAmountToBePaid.subtract(totalRepaymentsMade);
@@ -196,7 +197,8 @@ public class LoanApplicationService {
             throw new RepaymentAmountExceededException("Repayment amount exceeds remaining balance for loan application with id: " + request.getLoanId());
         }
 
-        BigDecimal interest = remainingBalance.subtract(loanAmount);
+        BigDecimal interest = repaymentAmount.multiply(totalInterest).divide(totalAmountToBePaid, 2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal principal = repaymentAmount.subtract(interest);
         BigDecimal remainingAmountWithInterest = remainingBalance.subtract(repaymentAmount);
 
         Repayment repayment = new Repayment();
@@ -204,21 +206,10 @@ public class LoanApplicationService {
         repayment.setAmount(repaymentAmount);
         repayment.setPaymentDate(LocalDate.now());
         repayment.setInterest(interest);
-        repayment.setPrincipal(repaymentAmount.subtract(interest));
+        repayment.setPrincipal(principal);
 
         repaymentRepository.save(repayment);
 
         return new RepaymentResponse("Repayment recorded for loan application with id: " + request.getLoanId(), remainingAmountWithInterest);
-    }
-
-    private BigDecimal calculateInterest(LoanApplication loanApplication, BigDecimal amount) {
-        BigDecimal interestRate = new BigDecimal("0.1"); // Setting the interest rate to (10%). In a real world application, I believe we should have another entity with rules of loan amount range and their respective interest rates.
-        return amount.multiply(interestRate);
-    }
-
-    private BigDecimal calculateRemainingBalance(LoanApplication loanApplication) {
-        BigDecimal totalLoanAmount = loanApplication.getLoanAmount();
-        BigDecimal totalRepayments = repaymentRepository.getTotalRepaymentsByLoanApplication(loanApplication);
-        return totalLoanAmount.subtract(totalRepayments);
     }
 }
