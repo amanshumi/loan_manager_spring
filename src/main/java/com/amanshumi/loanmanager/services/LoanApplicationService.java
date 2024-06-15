@@ -40,9 +40,13 @@ public class LoanApplicationService {
     public LoanApplicationResponseDTO submitLoanApplication(LoanApplicationRequestDTO request) {
         myLoanLogger.info("Starting Loan Request");
         myLoanLogger.info("Payload: " + request.toString());
+        // This validation can also be enhanced by defining rules on a separate entity on db, but I just put it here for demonstration
+        validateIncomeToLoanRatio(request.getBorrowerIncome(), request.getLoanAmount());
+
         // Check if borrower exists by email
         Optional<Borrower> optionalBorrower = borrowerRepository.findByEmail(request.getBorrowerEmail());
         Borrower borrower;
+
         if (optionalBorrower.isPresent()) {
             borrower = optionalBorrower.get();
             // Check for any outstanding loans
@@ -60,6 +64,7 @@ public class LoanApplicationService {
             borrower.setPhoneNumber(request.getBorrowerPhoneNumber());
             borrower.setEmail(request.getBorrowerEmail());
             borrower.setIncome(request.getBorrowerIncome());
+            // in a real world application, we should check the credit score based on the customer's previous profile or transaction history using a credit scoring engine. this is just for formality here
             borrower.setCreditScore(request.getBorrowerCreditScore());
             borrower = borrowerRepository.save(borrower);
         }
@@ -94,6 +99,14 @@ public class LoanApplicationService {
         myLoanLogger.info("DETAILS: " + response.toString());
 
         return response;
+    }
+
+    private void validateIncomeToLoanRatio(BigDecimal income, BigDecimal loanAmount) {
+        BigDecimal ratio = income.divide(loanAmount, 2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal minimumRatio = new BigDecimal("0.25"); // 1:4 ratio
+        if (ratio.compareTo(minimumRatio) < 0) {
+            throw new IncomeToLoanRatioException("Income to loan ratio is less than the required 1:4");
+        }
     }
 
     public LoanDetailsResponseDTO getLoanDetailsById(Long loanId) {

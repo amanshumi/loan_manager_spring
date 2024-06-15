@@ -2,6 +2,7 @@ package com.amanshumi.loanmanager.handlers;
 
 import com.amanshumi.loanmanager.dto.response.ErrorResponse;
 import com.amanshumi.loanmanager.exceptions.AlreadyApprovedException;
+import com.amanshumi.loanmanager.exceptions.IncomeToLoanRatioException;
 import com.amanshumi.loanmanager.exceptions.LoanAlreadyDisbursedException;
 import com.amanshumi.loanmanager.exceptions.OutstandingLoanException;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,19 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),
                 "Loan Already Disbursed",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(IncomeToLoanRatioException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ErrorResponse> handleIncomeToRatioException(IncomeToLoanRatioException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),
+                "Invalid Income To Loan Ratio",
                 ex.getMessage(),
                 request.getDescription(false)
         );
