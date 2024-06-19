@@ -28,4 +28,13 @@ public class RejectLoanRequest {
     public void setApprover(String approver) {
         this.approver = approver;
     }
+
+    @Override
+    public String toString() {
+        return "RejectLoanRequest{" +
+                "loanId=" + loanId +
+                ", approver='" + approver + '\'' +
+                ", reason='" + reason + '\'' +
+                '}';
+    }
 }

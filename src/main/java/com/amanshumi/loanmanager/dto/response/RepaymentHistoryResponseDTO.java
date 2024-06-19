@@ -61,6 +61,23 @@ public class RepaymentHistoryResponseDTO {
         public void setPrincipal(BigDecimal principal) {
             this.principal = principal;
         }
+
+        @Override
+        public String toString() {
+            return "RepaymentDTO{" +
+                    "amount=" + amount +
+                    ", paymentDate=" + paymentDate +
+                    ", interest=" + interest +
+                    ", principal=" + principal +
+                    '}';
+        }
     }
 
+    @Override
+    public String toString() {
+        return "RepaymentHistoryResponseDTO{" +
+                "loanId=" + loanId +
+                ", repayments=" + repayments +
+                '}';
+    }
 }

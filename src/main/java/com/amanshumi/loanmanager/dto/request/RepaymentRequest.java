@@ -21,4 +21,12 @@ public class RepaymentRequest {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "RepaymentRequest{" +
+                "loanId=" + loanId +
+                ", amount=" + amount +
+                '}';
+    }
 }

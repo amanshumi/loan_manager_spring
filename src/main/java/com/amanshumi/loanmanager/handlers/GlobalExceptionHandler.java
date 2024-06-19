@@ -1,10 +1,7 @@
 package com.amanshumi.loanmanager.handlers;
 
 import com.amanshumi.loanmanager.dto.response.ErrorResponse;
-import com.amanshumi.loanmanager.exceptions.AlreadyApprovedException;
-import com.amanshumi.loanmanager.exceptions.IncomeToLoanRatioException;
-import com.amanshumi.loanmanager.exceptions.LoanAlreadyDisbursedException;
-import com.amanshumi.loanmanager.exceptions.OutstandingLoanException;
+import com.amanshumi.loanmanager.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,6 +17,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OutstandingLoanException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleOutstandingLoanException(OutstandingLoanException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(LoanApplicationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleLoanApplicationException(LoanApplicationException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),

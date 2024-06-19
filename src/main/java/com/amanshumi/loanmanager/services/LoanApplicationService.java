@@ -43,6 +43,9 @@ public class LoanApplicationService {
         // This validation can also be enhanced by defining rules on a separate entity on db, but I just put it here for demonstration
         validateIncomeToLoanRatio(request.getBorrowerIncome(), request.getLoanAmount());
 
+        // Validate credit score
+        validateCreditScore(request.getBorrowerCreditScore());
+
         // Check if borrower exists by email
         Optional<Borrower> optionalBorrower = borrowerRepository.findByEmail(request.getBorrowerEmail());
         Borrower borrower;
@@ -101,6 +104,12 @@ public class LoanApplicationService {
         return response;
     }
 
+    private void validateCreditScore(int creditScore) {
+        if (creditScore < 580) {
+            throw new LoanApplicationException("Credit score is too low for loan approval: " + creditScore);
+        }
+    }
+
     private void validateIncomeToLoanRatio(BigDecimal income, BigDecimal loanAmount) {
         BigDecimal ratio = income.divide(loanAmount, 2, BigDecimal.ROUND_HALF_UP);
         BigDecimal minimumRatio = new BigDecimal("0.25"); // 1:4 ratio
@@ -110,8 +119,10 @@ public class LoanApplicationService {
     }
 
     public LoanDetailsResponseDTO getLoanDetailsById(Long loanId) {
+        myLoanLogger.info("Starting fetching loan details by id: " + loanId);
         LoanApplication loanApplication = loanApplicationRepository.findByIdWithBorrower(loanId);
         if (loanApplication == null) {
+            myLoanLogger.error("Loan application not found with id : " + loanId);
             throw new LoanApplicationNotFoundException("Loan application not found with id: " + loanId);
         }
 
@@ -129,15 +140,21 @@ public class LoanApplicationService {
         responseDTO.setStatus(loanApplication.getApprovalStatus().getStatus());
         responseDTO.setApplicationDate(loanApplication.getApplicationDate());
 
+        myLoanLogger.info("Loan details fetched successfully");
+        myLoanLogger.debug(responseDTO.toString());
+
         return responseDTO;
     }
 
     public ApproveLoanResponse approveLoanApplication(ApproveLoanRequest request) {
+        myLoanLogger.info("Starting loan approval : " + request.toString());
+
         LoanApplication loanApplication = loanApplicationRepository.findById(request.getLoanId())
                 .orElseThrow(() -> new LoanApplicationNotFoundException("Loan application not found with id: " + request.getLoanId()));
 
         ApprovalStatus approvalStatus = loanApplication.getApprovalStatus();
         if (approvalStatus.getStatus().equals("APPROVED")) {
+            myLoanLogger.error("Loan application already approved with id: " + request.getLoanId());
             throw new AlreadyApprovedException("Loan application with id " + request.getLoanId() + " is already approved");
         }
 
@@ -147,20 +164,25 @@ public class LoanApplicationService {
 
         loanApplicationRepository.save(loanApplication);
 
+        myLoanLogger.info("Loan application approved successfully : " + approvalStatus.toString());
+
         return new ApproveLoanResponse("Loan application with id " + request.getLoanId() + " has been approved", approvalStatus.getReviewer());
     }
 
     public RejectLoanResponse rejectLoan(RejectLoanRequest request) {
+        myLoanLogger.info("Starting loan rejection : " + request.toString());
         LoanApplication loanApplication = loanApplicationRepository.findById(request.getLoanId())
                 .orElseThrow(() -> new LoanApplicationNotFoundException("Loan application not found with id: " + request.getLoanId()));
 
         ApprovalStatus approvalStatus = loanApplication.getApprovalStatus();
 
         if (approvalStatus.getStatus().equals("APPROVED")) {
+            myLoanLogger.error("Cannot reject an already approved loan");
             throw new AlreadyApprovedException("Cannot reject an already approved loan");
         }
 
         if (approvalStatus.getStatus().equals("REJECTED")) {
+            myLoanLogger.error("Loan with id " + request.getLoanId() + " is already rejected");
             throw new AlreadyApprovedException("Loan application with id " + request.getLoanId() + " is already rejected");
         }
 
@@ -170,6 +192,8 @@ public class LoanApplicationService {
         approvalStatus.setApprovalDate(LocalDate.now());
 
         loanApplicationRepository.save(loanApplication);
+
+        myLoanLogger.info("Loan rejection successful : " + approvalStatus.toString());
 
         return new RejectLoanResponse("Loan application with id " + request.getLoanId() + " has been rejected", approvalStatus.getMessage());
     }

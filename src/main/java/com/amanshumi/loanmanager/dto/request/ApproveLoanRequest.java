@@ -19,4 +19,12 @@ public class ApproveLoanRequest {
     public void setApprover(String approver) {
         this.approver = approver;
     }
+
+    @Override
+    public String toString() {
+        return "ApproveLoanRequest{" +
+                "loanId=" + loanId +
+                ", approver='" + approver + '\'' +
+                '}';
+    }
 }
